@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Memorize by Heart — Revelado progresivo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Roboto:wght@400;500;700;900&family=Georgia:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0,1" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #e9eef3;
+            font-family: 'Inter', 'Roboto', 'Avenir Next', system-ui, sans-serif;
+            color: #142033;
+            -webkit-font-smoothing: antialiased;
+        }
+        .app-container { min-height: 100vh; display: flex; flex-direction: column; }
+        .hero {
+            background-color: #207FCA;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            padding: 60px 24px;
+        }
+        @media (max-width: 768px) { .hero { padding: 40px 20px; } }
+        .hero-glow {
+            background: radial-gradient(circle at 14% 18%, rgba(255,255,255,0.1), transparent 28%),
+                        radial-gradient(circle at 84% 28%, rgba(255,255,255,0.08), transparent 24%);
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+        }
+        .hero-text { flex: 1; }
+        .hero-text h1 {
+            font-family: Georgia, serif;
+            font-weight: 800;
+            font-size: 3rem;
+            line-height: 0.96;
+            margin-bottom: 12px;
+        }
+        .hero-text p {
+            color: #d7e6f4;
+            font-style: italic;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-bottom: 16px;
+            padding: 6px 0;
+        }
+        .info-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 24px 54px rgba(20, 32, 51, 0.2);
+            padding: 20px 24px;
+            min-width: 280px;
+            max-width: 560px;
+            width: 100%;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .card-header h3 {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: #142033;
+        }
+        .badge {
+            background: #dfe8f3;
+            border-radius: 40px;
+            padding: 5px 14px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #1b7fd4;
+        }
+        .toggle-group {
+            display: flex;
+            gap: 8px;
+            background: #f7fafc;
+            border-radius: 48px;
+            padding: 4px;
+            width: fit-content;
+            border: 1px solid #c9d4e1;
+            margin-bottom: 18px;
+        }
+        .toggle-option {
+            padding: 5px 18px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            border-radius: 40px;
+            background: transparent;
+            color: #66758a;
+        }
+        .toggle-option.active {
+            background: white;
+            color: #1b7fd4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+        .score-chip {
+            background: #f0f3f9;
+            border-radius: 30px;
+            padding: 5px 14px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .icon-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+        }
+        .icon-btn:hover { background: rgba(0,0,0,0.05); }
+        .main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 28px;
+            align-items: start;
+        }
+        @media (max-width: 860px) {
+            .quiz-grid { grid-template-columns: 1fr; }
+        }
+        .text-panel {
+            background: white;
+            border: 1px solid #c9d4e1;
+            border-radius: 18px;
+            box-shadow: 0 24px 48px rgba(20,32,51,0.08);
+            padding: 28px 32px;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 40px;
+            height: 6px;
+            margin-bottom: 28px;
+        }
+        .progress-fill {
+            background: #1b7fd4;
+            width: 0%;
+            height: 6px;
+            border-radius: 40px;
+            transition: width 0.25s;
+        }
+        .revelation-text {
+            font-family: 'Inter', Georgia, serif;
+            font-size: 1.35rem;
+            line-height: 1.5;
+            font-weight: 500;
+            color: #142033;
+            margin-bottom: 24px;
+            word-break: break-word;
+            background: #f9fbfd;
+            padding: 20px;
+            border-radius: 16px;
+            border-left: 4px solid #1b7fd4;
+        }
+        .blank-highlight {
+            display: inline-block;
+            background: #eef4fb;
+            border-radius: 12px;
+            padding: 0 10px;
+            font-weight: 800;
+            text-decoration: underline;
+            text-decoration-thickness: 3px;
+            text-decoration-color: #1b7fd4;
+            text-underline-offset: 6px;
+        }
+        .revealed-word {
+            font-weight: 700;
+            color: #1b7fd4;
+            background: #eaf4ff;
+            border-radius: 8px;
+            padding: 0 4px;
+        }
+        .choice-panel {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #c9d4e1;
+            box-shadow: 0 18px 40px rgba(20,32,51,0.08);
+            padding: 20px;
+            position: sticky;
+            top: 24px;
+        }
+        .choice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid #eef2f8;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+        .choice-eyebrow {
+            font-weight: 900;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #1b7fd4;
+        }
+        .question-counter {
+            background: #dfe8f3;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0 28px;
+        }
+        .option-btn {
+            background: #f7fafc;
+            border: 1.5px solid #c9d4e1;
+            border-radius: 14px;
+            padding: 14px 6px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.18s;
+            color: #142033;
+            text-align: center;
+        }
+        .option-btn:hover {
+            background: #eef4ff;
+            border-color: #9fc8ef;
+        }
+        .option-selected {
+            background: #dbeaf8 !important;
+            border-color: #1b7fd4 !important;
+            color: #0a5c9e;
+        }
+        .action-row {
+            display: flex;
+            gap: 16px;
+        }
+        .action {
+            flex: 1;
+            padding: 12px;
+            border-radius: 60px;
+            font-weight: 900;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .action-skip {
+            background: transparent;
+            border: 1.5px solid #c9d4e1;
+            color: #66758a;
+        }
+        .action-done {
+            background: #2D9E6E;
+            color: white;
+            box-shadow: 0 2px 6px rgba(45,158,110,0.2);
+        }
+        .feedback {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px;
+            border-radius: 40px;
+        }
+        .input-screen {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 28px;
+            padding: 32px;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .input-screen textarea {
+            width: 100%;
+            padding: 16px;
+            font-size: 1rem;
+            font-family: 'Inter', monospace;
+            border: 1px solid #c9d4e1;
+            border-radius: 20px;
+            resize: vertical;
+            margin: 20px 0;
+        }
+        .start-btn {
+            background: #2D9E6E;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.7rem;
+            padding: 28px;
+            color: #7b8ba3;
+        }
+        .hidden { display: none; }
+        .legend-note {
+            font-size: 0.75rem;
+            color: #66758a;
+            border-top: 1px solid #eef2f8;
+            padding-top: 18px;
+            display: flex;
+            gap: 20px;
+            margin-top: auto;
+        }
+        @media (max-width: 500px) {
+            .options-grid { gap: 10px; }
+            .option-btn { font-size: 0.85rem; padding: 12px 4px; }
+            .revelation-text { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-container">
+            <div class="hero-text">
+                <button class="back-btn" id="globalBackBtn">
+                    <span class="material-symbols-outlined">arrow_back</span> Inicio
+                </button>
+                <h1>MULTIPLE CHOICE</h1>
+                <p>Revelado progresivo — acierta y la palabra se muestra completa</p>
+            </div>
+            <div class="info-card">
+                <div class="card-header">
+                    <h3 id="textTitle">Tu texto</h3>
+                    <div class="badge">Revelado por aciertos</div>
+                </div>
+                <div class="toggle-group">
+                    <span class="toggle-option active">Evaluate</span>
+                    <span class="toggle-option">Whole text</span>
+                </div>
+                <div class="card-footer">
+                    <div class="score-chip" id="scoreChip">🏆 Aciertos: 0 / 0</div>
+                    <div>
+                        <button class="icon-btn" id="restartQuizBtn">
+                            <span class="material-symbols-outlined">refresh</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div id="inputScreen" class="input-screen">
+            <h2>📝 Ingresa el texto que quieres memorizar</h2>
+            <p>Copia y pega cualquier texto (poema, discurso, definición...)</p>
+            <textarea id="userText" rows="6" placeholder="Ejemplo:&#10;El endoplasma es la porción interna del citoplasma celular que rodea al núcleo."></textarea>
+            <button id="startMemorizeBtn" class="start-btn">Comenzar memorización →</button>
+        </div>
+
+        <div id="quizScreen" class="hidden">
+            <div class="quiz-grid">
+                <div class="text-panel">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="revelation-text" id="revelationText"></div>
+                    <div class="legend-note">
+                        <span>✅ Las palabras en <span style="background:#eaf4ff; padding:2px 6px; border-radius:12px;">azul</span> ya las has acertado.</span>
+                        <span>🔍 El espacio _____ es la palabra que debes adivinar.</span>
+                    </div>
+                </div>
+                <div class="choice-panel">
+                    <div class="choice-header">
+                        <span class="choice-eyebrow">CHOOSE THE CORRECT WORD</span>
+                        <span class="question-counter" id="questionCounter">0 of 0</span>
+                    </div>
+                    <div class="options-grid" id="optionsGrid"></div>
+                    <div class="action-row">
+                        <button class="action action-skip" id="skipBtn">Skip</button>
+                        <button class="action action-done" id="doneBtn">Done</button>
+                    </div>
+                    <div id="feedbackMsg" class="feedback"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">Memorize by Heart · Acierta → revela la palabra · Fallo → sigue como inicial</div>
+</div>
+
+<script>
+    // ---------- ESTADO ----------
+    let originalWords = [];        // array de palabras originales
+    let revealed = [];             // boolean: true si la palabra ya fue acertada (y se muestra completa)
+    let totalQuestions = 0;
+    let currentIndex = 0;
+    let score = 0;
+    let selectedAnswer = null;
+    let isLocked = false;
+    let originalFullText = "";
+
+    // DOM
+    const inputScreen = document.getElementById('inputScreen');
+    const quizScreen = document.getElementById('quizScreen');
+    const startBtn = document.getElementById('startMemorizeBtn');
+    const userTextarea = document.getElementById('userText');
+    const textTitleSpan = document.getElementById('textTitle');
+    const revelationDiv = document.getElementById('revelationText');
+    const optionsGrid = document.getElementById('optionsGrid');
+    const questionCounterSpan = document.getElementById('questionCounter');
+    const progressFill = document.getElementById('progressFill');
+    const scoreChip = document.getElementById('scoreChip');
+    const skipBtn = document.getElementById('skipBtn');
+    const doneBtn = document.getElementById('doneBtn');
+    const restartQuizBtn = document.getElementById('restartQuizBtn');
+    const globalBackBtn = document.getElementById('globalBackBtn');
+    const feedbackDiv = document.getElementById('feedbackMsg');
+
+    function tokenizeWords(text) {
+        return text.trim().split(/\s+/).filter(w => w.length > 0);
+    }
+
+    // Devuelve la primera letra de una palabra (conservando puntuación inicial)
+    function firstLetterOf(word) {
+        if (word.length === 0) return '';
+        const match = word.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/u);
+        if (match) {
+            const idx = match.index;
+            return word.substring(0, idx) + word[idx];
+        }
+        return word;
+    }
+
+    // Renderiza el texto completo según estado de 'revealed' y la posición actual (blank)
+    function renderProgressiveText() {
+        let displayParts = [];
+        for (let i = 0; i < originalWords.length; i++) {
+            const word = originalWords[i];
+            if (i === currentIndex) {
+                // palabra actual: siempre blank (independientemente de si estaba revelada, se oculta)
+                displayParts.push('<span class="blank-highlight">_________</span>');
+            } else if (revealed[i]) {
+                // palabra ya acertada: se muestra COMPLETA (con estilo especial)
+                displayParts.push(`<span class="revealed-word">${escapeHtml(word)}</span>`);
+            } else {
+                // palabra no acertada y no es la actual: solo su inicial
+                displayParts.push(firstLetterOf(word));
+            }
+        }
+        revelationDiv.innerHTML = displayParts.join(' ');
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Genera opciones para la palabra actual (distractores del mismo texto)
+    function generateOptions(correctWord, allWords, currentPos) {
+        let candidates = allWords.filter((w, idx) => idx !== currentPos && w !== correctWord);
+        let unique = [...new Set(candidates)];
+        let needed = Math.min(5, unique.length);
+        let shuffled = [...unique];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        let distractors = shuffled.slice(0, needed);
+        const fallbacks = ["palabra", "texto", "frase", "oración", "contenido"];
+        while(distractors.length < 3) {
+            let fb = fallbacks[distractors.length % fallbacks.length];
+            if(fb !== correctWord && !distractors.includes(fb)) distractors.push(fb);
+        }
+        let options = [correctWord, ...distractors];
+        for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+        }
+        return options;
+    }
+
+    function renderCurrentQuestion() {
+        if (currentIndex >= totalQuestions) {
+            finishQuiz();
+            return;
+        }
+        // Actualizar el texto revelado
+        renderProgressiveText();
+
+        // Generar opciones
+        const correct = originalWords[currentIndex];
+        const opts = generateOptions(correct, originalWords, currentIndex);
+        optionsGrid.innerHTML = '';
+        selectedAnswer = null;
+        opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.addEventListener('click', () => {
+                if (isLocked) return;
+                document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('option-selected'));
+                btn.classList.add('option-selected');
+                selectedAnswer = opt;
+                feedbackDiv.innerHTML = '';
+            });
+            optionsGrid.appendChild(btn);
+        });
+
+        questionCounterSpan.innerText = `${currentIndex+1} of ${totalQuestions}`;
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+        scoreChip.innerHTML = `🏆 Aciertos: ${score} / ${totalQuestions}`;
+        feedbackDiv.innerHTML = '';
+    }
+
+    function finishQuiz() {
+        revelationDiv.innerHTML = `<div style="text-align:center; padding:20px;">🎉 ¡Texto completamente memorizado! 🎉<br>Puntuación final: ${score} / ${totalQuestions}<br><button id="restartFinishBtn" style="margin-top:18px; background:#2D9E6E; border:none; padding:10px 28px; border-radius:60px; color:white; font-weight:bold; cursor:pointer;">Memorizar otro texto</button></div>`;
+        optionsGrid.innerHTML = '<div style="text-align:center;">✨ ¡Felicidades! Has revelado todas las palabras. ✨</div>';
+        doneBtn.disabled = true;
+        skipBtn.disabled = true;
+        isLocked = true;
+        const restartFinish = document.getElementById('restartFinishBtn');
+        if(restartFinish) restartFinish.addEventListener('click', () => resetToInput());
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        if (currentIndex < totalQuestions) {
+            renderCurrentQuestion();
+        } else {
+            finishQuiz();
+        }
+        isLocked = false;
+    }
+
+    function handleDone() {
+        if (isLocked) {
+            feedbackDiv.innerHTML = '⏳ Espera...';
+            return;
+        }
+        if (!selectedAnswer) {
+            feedbackDiv.innerHTML = '⚠️ Selecciona una palabra antes de continuar.';
+            return;
+        }
+        isLocked = true;
+        const correct = originalWords[currentIndex];
+        const isCorrect = (selectedAnswer === correct);
+        if (isCorrect) {
+            score++;
+            // REVELAR la palabra actual (marcar como revelada permanentemente)
+            revealed[currentIndex] = true;
+            feedbackDiv.innerHTML = '✅ ¡Correcto! La palabra ha sido revelada.';
+            feedbackDiv.style.color = '#1e7e34';
+        } else {
+            feedbackDiv.innerHTML = `❌ Incorrecto. La palabra correcta era "${correct}". Permanece como inicial.`;
+            feedbackDiv.style.color = '#c2410c';
+        }
+        scoreChip.innerHTML = `🏆 Aciertos: ${score} / ${totalQuestions}`;
+        // Redibujar el texto con el nuevo estado de revelado
+        renderProgressiveText();
+        setTimeout(() => {
+            nextQuestion();
+        }, 800);
+    }
+
+    function handleSkip() {
+        if (isLocked) return;
+        isLocked = true;
+        feedbackDiv.innerHTML = '⏩ Omitida. Pasando a la siguiente...';
+        setTimeout(() => {
+            nextQuestion();
+        }, 400);
+    }
+
+    function startQuizWithText(text) {
+        if (!text.trim()) {
+            alert("Por favor ingresa un texto válido.");
+            return;
+        }
+        originalFullText = text;
+        originalWords = tokenizeWords(text);
+        if (originalWords.length === 0) {
+            alert("El texto no contiene palabras reconocibles.");
+            return;
+        }
+        totalQuestions = originalWords.length;
+        revealed = new Array(totalQuestions).fill(false);
+        currentIndex = 0;
+        score = 0;
+        isLocked = false;
+        selectedAnswer = null;
+
+        inputScreen.classList.add('hidden');
+        quizScreen.classList.remove('hidden');
+
+        let shortTitle = originalWords.slice(0, 5).join(' ') + (originalWords.length > 5 ? '…' : '');
+        textTitleSpan.innerText = shortTitle || "Texto personalizado";
+
+        doneBtn.disabled = false;
+        skipBtn.disabled = false;
+
+        renderCurrentQuestion();
+    }
+
+    function resetToInput() {
+        inputScreen.classList.remove('hidden');
+        quizScreen.classList.add('hidden');
+        originalWords = [];
+        totalQuestions = 0;
+        score = 0;
+        currentIndex = 0;
+        isLocked = false;
+        selectedAnswer = null;
+        userTextarea.value = "";
+        textTitleSpan.innerText = "Tu texto";
+        scoreChip.innerHTML = "🏆 Aciertos: 0 / 0";
+    }
+
+    // Event listeners
+    startBtn.addEventListener('click', () => startQuizWithText(userTextarea.value));
+    skipBtn.addEventListener('click', handleSkip);
+    doneBtn.addEventListener('click', handleDone);
+    restartQuizBtn.addEventListener('click', () => {
+        if (confirm("¿Reiniciar el mismo texto? Se perderá el progreso actual.")) {
+            startQuizWithText(originalFullText);
+        }
+    });
+    globalBackBtn.addEventListener('click', () => {
+        if (!inputScreen.classList.contains('hidden')) return;
+        if (confirm("Volver al inicio. Se perderá el progreso actual.")) {
+            resetToInput();
+        }
+    });
+</script>
+</body>
+</html>
